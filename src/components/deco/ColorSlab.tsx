@@ -27,9 +27,8 @@ type ColorSlabProps = {
 }
 
 /**
- * The workhorse: a torn, textured, rotated block of flat color. Behind
- * content in `Frame`, but usable standalone anywhere a loud color patch is
- * needed.
+ * The workhorse: a torn, textured, rotated block of flat color. Sits
+ * behind the video stills and the about-me polaroid.
  *
  * `rotate` is expected to stay within ±2.5deg (the spec's cap — beyond that
  * the tilt reads as a bug, not a design choice). Not enforced at runtime;
@@ -40,8 +39,7 @@ type ColorSlabProps = {
  * before `.relative`, so at equal specificity `relative` wins regardless of
  * the order you write them in the attribute — the slab collapses to
  * `height: 0` and vanishes with no error anywhere. To place a slab behind
- * content, position a WRAPPER div and give the slab `h-full w-full`, the way
- * `Frame` does.
+ * content, position a WRAPPER div and give the slab `h-full w-full`.
  */
 export function ColorSlab({
   seed,
@@ -98,8 +96,7 @@ export function ColorSlab({
           luminosity, so it reads as a tint over the plate rather than a flat
           wash; the div's own opacity (not the ink's alpha) controls how
           strong that tint is, same trick as the texture layers above. Scoped
-          to `image` only — flat pop-ink slabs elsewhere on the page (Hero,
-          DarkCTA) are untouched. */}
+          to `image` only. */}
       {image && (
         <div
           className={`pointer-events-none absolute inset-0 ${color}`}

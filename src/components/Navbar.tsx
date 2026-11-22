@@ -1,11 +1,6 @@
 import type { MouseEvent } from 'react'
 import { PixelIcon } from './PixelIcon'
 
-/**
- * Sticky top bar — mounted once in App.tsx, outside <main>, so it isn't
- * subject to the frame-width constraint sections use; the inner wrapper
- * re-aligns to the frame verticals the same way Section.tsx does.
- */
 export function Navbar({
   onOpenContact,
 }: {
@@ -13,20 +8,17 @@ export function Navbar({
 }) {
   return (
     <header className="sticky top-0 z-40 bg-pop-lime">
-      <div className="mx-auto flex w-full max-w-frame items-center justify-between px-4 py-4 sm:px-6">
-        <div className="flex items-center gap-2 text-ink">
+      <div className="mx-auto flex w-full max-w-frame items-center justify-between gap-2 px-4 py-4 sm:px-6">
+        <div className="flex items-center gap-1.5 text-ink sm:gap-2">
           <PixelIcon name="smile" size={22} />
-          <span
-            className="font-sans lowercase font-extrabold"
-            style={{ fontSize: '1.25rem', letterSpacing: '-0.01em' }}
-          >
-            bach le's application
+          <span translate="no" className="text-base font-extrabold tracking-[-0.01em] whitespace-nowrap sm:text-[1.25rem]">
+            bach le’s portfolio
           </span>
         </div>
         <button
           type="button"
           onClick={onOpenContact}
-          className="bg-ink px-5 py-2.5 text-[0.8125rem] font-bold text-pop-lime transition-opacity duration-200 hover:opacity-80"
+          className="shrink-0 bg-ink px-2.5 py-2.5 whitespace-nowrap sm:px-5 text-[0.8125rem] font-bold text-pop-lime transition-opacity duration-200 hover:opacity-80 focus-visible:outline-ink"
         >
           contact me
         </button>

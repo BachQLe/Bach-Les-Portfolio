@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import type { RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import { PixelIcon } from './PixelIcon'
-import { SocialIcon } from './SocialIcon'
+import { ContactLinks } from './ContactLinks'
 
 const HEADING_ID = 'contact-modal-heading'
 
@@ -10,13 +10,8 @@ const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
 /**
- * Liquid-glass contact dialog, opened by the navbar's "contact me" button or
- * either DarkCTA button. Portaled to `document.body` so its `fixed inset-0`
- * always resolves against the real viewport, regardless of which trigger's
- * ancestors do (DarkCTA's section has a transform on it, which would
- * otherwise become the containing block for a fixed descendant). Traps
- * focus, closes on Escape or backdrop click, and returns focus to whichever
- * trigger actually opened it.
+ * Liquid-glass contact dialog. Portaled to `document.body`, traps focus,
+ * closes on Escape or backdrop click, and returns focus to its trigger.
  */
 export function ContactModal({
   open,
@@ -87,7 +82,7 @@ export function ContactModal({
   if (!open) return null
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 overscroll-contain flex items-center justify-center p-4">
       {/* Backdrop is a sibling of the panel, stacked underneath — panel
           clicks never bubble to it, so no stopPropagation is needed. */}
       <div
@@ -101,7 +96,7 @@ export function ContactModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={HEADING_ID}
-        className="modal-glass animate-modal-in relative z-10 w-full max-w-sm p-8"
+        className="modal-glass animate-modal-in relative z-10 max-h-full w-full max-w-sm overflow-y-auto p-8"
       >
         <button
           ref={closeButtonRef}
@@ -113,60 +108,15 @@ export function ContactModal({
           <PixelIcon name="cross" size={26} />
         </button>
 
-        {/* text-dark-muted throughout: this panel sits on the dark section,
+        {/* text-dark-muted throughout: this panel is dark,
             where text-muted (#6B7280) fails AA at these sizes. */}
         <h2 id={HEADING_ID} className="font-pixel text-[10px] text-dark-muted">
           reach me directly
         </h2>
 
-        <a
-          href="tel:+15714407983"
-          className="font-display mt-6 flex items-center gap-3 text-dark-ink transition-colors duration-200 hover:text-green"
-          style={{ fontSize: 'clamp(1.5rem, 6vw, 2.25rem)' }}
-        >
-          <PixelIcon name="phone" size={24} />
-          571-440-7983
-        </a>
-
-        <a
-          href="https://www.instagram.com/bachqle/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-5 flex items-center gap-3 text-[1rem] font-bold text-dark-ink transition-colors duration-200 hover:text-green"
-        >
-          <SocialIcon name="instagram" size={18} />
-          @bachqle
-          <PixelIcon name="arrow-up-right" size={10} />
-        </a>
-
-        <a
-          href="https://www.linkedin.com/in/baqh/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 flex items-center gap-3 text-[1rem] font-bold text-dark-ink transition-colors duration-200 hover:text-green"
-        >
-          <SocialIcon name="linkedin" size={18} />
-          linkedin
-          <PixelIcon name="arrow-up-right" size={10} />
-        </a>
-
-        <a
-          href="https://www.tiktok.com/@b4chle"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 flex items-center gap-3 text-[1rem] font-bold text-dark-ink transition-colors duration-200 hover:text-green"
-        >
-          <SocialIcon name="tiktok" size={18} />
-          @b4chle
-          <PixelIcon name="arrow-up-right" size={10} />
-        </a>
-
-        <a
-          href="mailto:bachqle.real@gmail.com"
-          className="font-pixel mt-8 block text-[9px] text-dark-muted transition-colors duration-200 hover:text-dark-ink"
-        >
-          bachqle.real@gmail.com
-        </a>
+        <div className="text-dark-ink">
+          <ContactLinks />
+        </div>
       </div>
     </div>,
     document.body,

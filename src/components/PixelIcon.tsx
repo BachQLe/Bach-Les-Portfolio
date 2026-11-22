@@ -3,8 +3,8 @@
  *
  * Each icon is authored as a square grid of strings: `'#'` marks a filled
  * pixel, `'.'` marks an empty one. Every grid must be N rows of N equal-length
- * characters — most icons use 8x8, but higher-detail icons (e.g. `music`) can
- * use a finer grid like 16x16. `PixelIcon` reads its viewBox from the grid's
+ * characters — most icons use 8x8, but a finer grid
+ * works too. `PixelIcon` reads its viewBox from the grid's
  * own dimensions, so mixed resolutions render at the same visual size. To
  * keep the rendered DOM small, `toRects` walks each row and merges
  * consecutive filled cells into a single `<rect>` run instead of emitting one
@@ -22,24 +22,13 @@ type IconGrid = readonly string[]
 
 export type PixelIconName =
   | 'film'
-  | 'music'
-  | 'code'
-  | 'trophy'
-  | 'controller'
-  | 'folder'
-  | 'heart'
   | 'star'
-  | 'check'
   | 'cross'
   | 'play'
   | 'phone'
-  | 'instagram'
-  | 'sparkle'
   | 'smile'
-  | 'happy-face'
-  | 'sad-face'
+  | 'heart'
   | 'arrow-up-right'
-  | 'briefcase'
 
 const ICONS: Partial<Record<PixelIconName, IconGrid>> = {
   film: [
@@ -52,68 +41,15 @@ const ICONS: Partial<Record<PixelIconName, IconGrid>> = {
     '#......#',
     '########',
   ],
-  // Treble clef, authored at 16x16 for the extra detail its spiral and
-  // lower loop need — an 8x8 grid can't resolve this shape cleanly.
-  music: [
-    '................',
-    '......##........',
-    '......####......',
-    '......#####.....',
-    '......#..###....',
-    '......#..###....',
-    '......#.###.....',
-    '......####......',
-    '......###.......',
-    '......##........',
-    '..###.#.........',
-    '.######.........',
-    '.######.........',
-    '.######.........',
-    '..####..........',
-    '................',
-  ],
-  // Two chevrons facing outward. The top and bottom rows stay empty on
-  // purpose — filling them closes the gap and the whole thing reads as a
-  // diamond outline instead of `< >`.
-  code: [
-    '........',
-    '..#..#..',
-    '.#....#.',
-    '#......#',
+  cross: [
     '#......#',
     '.#....#.',
     '..#..#..',
-    '........',
-  ],
-  trophy: [
-    '.######.',
-    '########',
-    '.######.',
-    '..####..',
     '...##...',
     '...##...',
-    '..####..',
-    '.######.',
-  ],
-  controller: [
-    '..####..',
-    '.######.',
-    '########',
-    '#.##.#.#',
-    '#.##.#.#',
-    '########',
-    '.######.',
-    '..####..',
-  ],
-  folder: [
-    '.####...',
-    '########',
+    '..#..#..',
+    '.#....#.',
     '#......#',
-    '#......#',
-    '#......#',
-    '#......#',
-    '#......#',
-    '########',
   ],
   heart: [
     '.##..##.',
@@ -124,26 +60,6 @@ const ICONS: Partial<Record<PixelIconName, IconGrid>> = {
     '..####..',
     '...##...',
     '........',
-  ],
-  check: [
-    '........',
-    '........',
-    '.......#',
-    '......#.',
-    '#....#..',
-    '.#..#...',
-    '..##....',
-    '........',
-  ],
-  cross: [
-    '#......#',
-    '.#....#.',
-    '..#..#..',
-    '...##...',
-    '...##...',
-    '..#..#..',
-    '.#....#.',
-    '#......#',
   ],
   play: [
     '..#.....',
@@ -165,18 +81,8 @@ const ICONS: Partial<Record<PixelIconName, IconGrid>> = {
     '.....###',
     '......##',
   ],
-  instagram: [
-    '########',
-    '#....#.#',
-    '#......#',
-    '#......#',
-    '#..##..#',
-    '#..##..#',
-    '#......#',
-    '########',
-  ],
-  // Filled disc with two punched eye-holes and a wide mouth gap — same solid,
-  // blocky weight as `heart`.
+  // Filled disc with two punched eye-holes and a wide mouth gap — solid
+  // and blocky.
   smile: [
     '..####..',
     '.######.',
@@ -186,41 +92,6 @@ const ICONS: Partial<Record<PixelIconName, IconGrid>> = {
     '##....##',
     '.######.',
     '..####..',
-  ],
-  // Outline face — a hollow ring (no interior fill), punched with two eye
-  // dots and a mouth. Shares its ring/eyes rows with `sad-face` below; only
-  // rows 4-5 (the mouth) differ, swapped between the two so the corners sit
-  // higher than the middle here (a cup/smile curve) and lower there (a
-  // frown).
-  'happy-face': [
-    '..####..',
-    '.#....#.',
-    '#.#..#.#',
-    '#......#',
-    '#.#..#.#',
-    '#..##..#',
-    '.#....#.',
-    '..####..',
-  ],
-  'sad-face': [
-    '..####..',
-    '.#....#.',
-    '#.#..#.#',
-    '#......#',
-    '#..##..#',
-    '#.#..#.#',
-    '.#....#.',
-    '..####..',
-  ],
-  briefcase: [
-    '..####..',
-    '..#..#..',
-    '########',
-    '#......#',
-    '########',
-    '#......#',
-    '#......#',
-    '########',
   ],
 }
 
@@ -236,10 +107,7 @@ const PATH_ICONS: Partial<Record<PixelIconName, { viewBox: number; d: string }>>
     viewBox: 600,
     d: 'M48.00,48.00 L48.00,168.00 L107.75,168.00 L108.00,228.00 L156.00,228.25 L156.00,300.00 L227.75,300.00 L228.00,360.00 L287.75,360.00 L288.00,420.00 L348.00,420.25 L347.75,480.00 L228.00,480.00 L228.00,540.00 L528.00,540.00 L528.00,300.00 L468.00,300.00 L468.00,419.75 L408.25,420.00 L408.00,360.00 L348.25,360.00 L348.00,300.00 L288.00,299.75 L288.00,240.00 L216.00,239.75 L216.00,168.00 L168.00,167.75 L168.00,108.00 L108.25,108.00 L108.00,48.00 Z',
   },
-  // Both `star` and `sparkle` intentionally share this same artwork — the
-  // site now uses one star shape everywhere instead of two different ones.
   star: { viewBox: 600, d: STAR_PATH_D },
-  sparkle: { viewBox: 600, d: STAR_PATH_D },
 }
 
 interface Rect {
@@ -296,7 +164,8 @@ export function PixelIcon({
     return (
       <svg viewBox={`0 0 ${pathIcon.viewBox} ${pathIcon.viewBox}`} {...sharedProps}>
         {title ? <title>{title}</title> : null}
-        <path d={pathIcon.d} />
+        {/* The arrow artwork is drawn pointing down-right */}
+        <path d={pathIcon.d} transform={name === 'arrow-up-right' ? 'rotate(-90 300 300)' : undefined} />
       </svg>
     )
   }

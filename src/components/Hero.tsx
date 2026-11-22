@@ -1,96 +1,40 @@
 import { useEffect, useRef, type CSSProperties } from 'react'
+import { ContactLinks } from './ContactLinks'
+import { ColorSlab } from './deco/ColorSlab'
 
 /**
- * The hero poster — ported from a Figma export (`hero.html` at the repo
- * root has the original static markup this was built from).
+ * The hero poster. Every child is positioned and sized in `cqw` against a
+ * 16:9 container, so type and portrait scale in lockstep. Don't convert them
+ * to rem/vw/%, they drift apart. The background sits on a full-bleed wrapper
+ * so the poster has no visible side edges.
  *
- * The poster's `container-type: inline-size` plus `cqw`-based positions and
- * sizes on every child lock the whole 1920×1080 composition (headline,
- * portrait, speech bubble) together: shrink the frame and every piece
- * scales in lockstep, instead of each fighting its own breakpoint. The
- * coordinates below are copied straight from the export — don't convert
- * them to rem/vw/%, that decouples them from the lock and the pieces drift
- * apart at sizes other than the one they were eyeballed at.
- *
- * Deliberately edge-to-edge (no section padding): this is a poster placed
- * in the frame, not a padded content cell, and it's opaque enough to occlude
- * the frame verticals it crosses — see RuleLayer's stacking comment.
+ * Contact info sits to the right from `md` up, and below on phones. From `lg`
+ * up the hero also lags the scroll by up to 100px so the next section rolls
+ * over it. Not below that, where it would cover the contact links.
  */
-
-/*
- * `--hero-progress` (0 → 1, set on the root element by the scroll effect
- * below) drives two things that live in different components: this
- * translateY, and the line-length grow in WhyMe's <FadingLines
- * growWithHero>. Whole-page-scoped custom property rather than props/context
- * because the two consumers are unrelated siblings in the tree, and reading
- * a CSS var costs a style recalc, not a React re-render, on every scroll tick.
- *
- * The lag is deliberately small (100px cap) — "doesn't move too much" — and
- * needs no z-index/position:sticky trick to get the roll-up-and-cover look:
- * this section is a plain static box, WhyMe right after it is `relative`
- * (Section.tsx) with an opaque surface fill, and default CSS paint order
- * already puts positioned siblings above static ones. Lagging behind the
- * scroll is what creates the overlap for that opaque sibling to cover.
- */
-
-/*
- * Extra height added above the original 1920×1080 composition, in cqw (same
- * unit as every child's position below). The background image is itself
- * exactly 1920×1080, so widening the box's aspect ratio like this makes
- * `bg-cover` scale it up to fill the added height — a zoom, not a letterbox.
- * Every child's `top` below has this added on top of its original authored
- * value so the whole composition stays pinned to the bottom of the frame;
- * the new space reads as blank top padding instead of shifting anything.
- */
-const HERO_TOP_PAD_CQW = 10
+const backdropStyle: CSSProperties = {
+  backgroundImage: 'url(/images/hero/background-texture.jpg)',
+}
 
 const posterStyle: CSSProperties = {
-  aspectRatio: `1920 / ${1080 + (HERO_TOP_PAD_CQW / 100) * 1920}`,
+  aspectRatio: '16 / 9',
   containerType: 'inline-size',
-  backgroundImage: 'url(/images/hero/background-texture.jpg)',
-  transform: 'translateY(calc(var(--hero-progress, 0) * 100px))',
 }
 
-/*
- * Entrance sequence, all on mount (nothing scroll-triggered — this is the
- * first thing on the page): the two headline lines drop in from above with
- * a stagger between them, the portrait pops up from below once the text has
- * landed (1500ms), and the bubble drops in the same way the text did, a
- * second after the portrait (2500ms). Durations stay short (~400ms) so the
- * staggered delays read as a snappy sequence rather than a slow build.
- * `prefers-reduced-motion` is handled globally (see bottom of index.css),
- * which collapses every duration here to ~0 automatically.
- */
-const line1Style: CSSProperties = {
-  left: '11.0cqw',
-  top: `${1.5 + HERO_TOP_PAD_CQW}cqw`,
-  fontSize: '14.5cqw',
-}
-const line2Style: CSSProperties = {
-  left: '11.0cqw',
-  top: `${15.0 + HERO_TOP_PAD_CQW}cqw`,
-  fontSize: '14.5cqw',
-  animationDelay: '200ms',
-}
+// Entrance: the two lines drop in, then the portrait pops up.
+const line1Style: CSSProperties = { top: '2.5cqw', fontSize: '14.5cqw' }
+const line2Style: CSSProperties = { top: '15.5cqw', fontSize: '14.5cqw', animationDelay: '200ms' }
 
 const photoStyle: CSSProperties = {
-  left: '30.0844cqw',
-  top: `${22.6312 + HERO_TOP_PAD_CQW}cqw`,
+  left: '30.639cqw',
+  top: '25.5cqw',
   width: '38.7220cqw',
   height: '39.4024cqw',
-  animationDelay: '1200ms',
-}
-
-const bubbleStyle: CSSProperties = {
-  left: '60.0cqw',
-  top: `${34.5003 + HERO_TOP_PAD_CQW}cqw`,
-  width: '14.1183cqw',
-  height: '10.5826cqw',
-  animationDelay: '2000ms',
+  animationDelay: '600ms',
 }
 
 /*
- * The headline now sits low enough that HIRE dips into the hair, where solid
+ * The headline sits low enough that it dips into the hair, where solid
  * black reads as a smudge against dark hair instead of type. These two
  * layers are a white-outline duplicate of each line, masked by the
  * portrait's own alpha channel — visible only where the portrait is opaque,
@@ -116,33 +60,36 @@ const maskShared: CSSProperties = {
 const line1MaskStyle: CSSProperties = {
   ...line1Style,
   ...maskShared,
-  WebkitMaskPosition: '19.0844cqw 21.1312cqw',
-  maskPosition: '19.0844cqw 21.1312cqw',
+  WebkitMaskPosition: '30.639cqw 23cqw',
+  maskPosition: '30.639cqw 23cqw',
 }
 
 const line2MaskStyle: CSSProperties = {
   ...line2Style,
   ...maskShared,
-  WebkitMaskPosition: '19.0844cqw 7.6312cqw',
-  maskPosition: '19.0844cqw 7.6312cqw',
+  WebkitMaskPosition: '30.639cqw 10cqw',
+  maskPosition: '30.639cqw 10cqw',
 }
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null)
+  const slideRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-    const root = document.documentElement
     let raf = 0
 
     function update() {
       raf = 0
       const el = sectionRef.current
-      if (!el) return
+      const slide = slideRef.current
+      if (!el || !slide) return
       const rect = el.getBoundingClientRect()
       const progress = rect.height > 0 ? Math.min(1, Math.max(0, 1 - rect.bottom / rect.height)) : 0
-      root.style.setProperty('--hero-progress', progress.toFixed(4))
+      // Only lg+ lags the scroll (see header comment); below that, no shift.
+      const lag = window.matchMedia('(min-width: 1024px)').matches ? progress * 100 : 0
+      slide.style.transform = `translate3d(0, ${lag.toFixed(1)}px, 0)`
     }
 
     function onScrollOrResize() {
@@ -157,50 +104,57 @@ export function Hero() {
       window.removeEventListener('scroll', onScrollOrResize)
       window.removeEventListener('resize', onScrollOrResize)
       if (raf) cancelAnimationFrame(raf)
-      root.style.removeProperty('--hero-progress')
+      if (slideRef.current) slideRef.current.style.transform = ''
     }
   }, [])
 
   return (
-    <section ref={sectionRef} className="mx-auto w-full max-w-frame">
-      <div className="relative w-full overflow-hidden bg-cover bg-center" style={posterStyle}>
-        <div
-          className="font-display text-ink animate-hero-drop-in absolute z-[1] leading-none whitespace-nowrap"
-          style={line1Style}
-        >
-          DANIEL PLS
-        </div>
-        <div
-          className="font-display text-ink animate-hero-drop-in absolute z-[1] leading-none whitespace-nowrap"
-          style={line2Style}
-        >
-          HIRE ME
-        </div>
-        <img
-          src="/images/hero/portrait.png"
-          alt="Bach Le wearing pixel-art sunglasses"
-          className="animate-hero-pop-up absolute z-[2] block"
-          style={photoStyle}
-        />
-        <img
-          src="/images/hero/speech-bubble.png"
-          alt="Speech bubble reading: I love lime"
-          className="animate-hero-drop-in absolute z-[3] block"
-          style={bubbleStyle}
-        />
-        <div
-          aria-hidden="true"
-          className="font-display animate-hero-drop-in pointer-events-none absolute z-[4] leading-none whitespace-nowrap"
-          style={line1MaskStyle}
-        >
-          DANIEL PLS
-        </div>
-        <div
-          aria-hidden="true"
-          className="font-display animate-hero-drop-in pointer-events-none absolute z-[4] leading-none whitespace-nowrap"
-          style={line2MaskStyle}
-        >
-          HIRE ME
+    <section ref={sectionRef}>
+      <div
+        ref={slideRef}
+        className="overflow-hidden bg-cover bg-center lg:will-change-transform"
+        style={backdropStyle}
+      >
+        <div className="mx-auto grid w-full max-w-frame md:grid-cols-[minmax(0,1fr)_17rem] md:pr-6">
+          <div className="relative w-full self-end overflow-hidden" style={posterStyle}>
+            <h1 className="font-display text-ink leading-none whitespace-nowrap">
+              <span className="animate-hero-drop-in absolute inset-x-0 z-[1] text-center" style={line1Style}>
+                HI I'M
+              </span>{' '}
+              <span className="animate-hero-drop-in absolute inset-x-0 z-[1] text-center" style={line2Style}>
+                BACH LE
+              </span>
+            </h1>
+            <img
+              src="/images/hero/portrait.png"
+              alt="Bach Le wearing pixel-art sunglasses"
+              width={1023}
+              height={1041}
+              fetchPriority="high"
+              className="animate-hero-pop-up absolute z-[2] block"
+              style={photoStyle}
+            />
+            <div aria-hidden="true" className="font-display pointer-events-none leading-none whitespace-nowrap">
+              <span className="animate-hero-drop-in absolute inset-x-0 z-[4] text-center" style={line1MaskStyle}>
+                HI I'M
+              </span>
+              <span className="animate-hero-drop-in absolute inset-x-0 z-[4] text-center" style={line2MaskStyle}>
+                BACH LE
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center border-t border-rule bg-surface px-6 py-9 md:border-0 md:bg-transparent md:px-0">
+            <div className="relative isolate w-full max-w-[17rem]">
+              <div className="absolute -inset-x-2 -inset-y-3 -z-10">
+                <ColorSlab seed="hero-contact" color="bg-pop-lime" rotate={2} className="h-full w-full" />
+              </div>
+              <div className="paper p-5 text-ink">
+                <h2 className="font-pixel text-[10px] text-muted">reach me directly</h2>
+                <ContactLinks />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
